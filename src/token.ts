@@ -1,7 +1,8 @@
 export enum TokenType {
   Heading = 'heading',
   EOF = 'eof',
-  Paragraph = 'paragraph'
+  Paragraph = 'paragraph',
+  LineBreak = 'linebreak',
 }
 
 export class Token {
@@ -33,6 +34,13 @@ export class ParagraphToken extends Token {
   constructor(raw: string) {
     super(TokenType.Paragraph, raw);
     this.content = raw;
+  }
+}
+
+export class LineBreakToken extends Token {
+
+  constructor(raw: string) {
+    super(TokenType.LineBreak, raw);
   }
 }
 

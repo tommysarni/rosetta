@@ -1,4 +1,4 @@
-import { Token, HeadingToken, EOFToken, ParagraphToken } from './token';
+import { Token, HeadingToken, EOFToken, ParagraphToken, LineBreakToken } from './token';
 
 export function tokenize(input: string): Token[] {
   if (!input.length) return [new EOFToken()];
@@ -29,6 +29,12 @@ export function tokenize(input: string): Token[] {
     // Headings
     if (/^#{1,6} /.test(line)) {
       tokens.push(new HeadingToken(line));
+      continue;
+    }
+
+    // Line Break
+    if (/^([*]{3}|[-]{3}|[_]{3}) /.test(line)) {
+      tokens.push(new LineBreakToken(line));
       continue;
     }
 

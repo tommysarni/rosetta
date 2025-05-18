@@ -1,4 +1,4 @@
-import { EOFToken, HeadingToken, ParagraphToken, TokenType } from '../src/token';
+import { EOFToken, HeadingToken, LineBreakToken, ParagraphToken, TokenType } from '../src/token';
 import { tokenize } from '../src/tokenizer';
 
 describe('Tokenizer', () => {
@@ -132,12 +132,60 @@ describe('Tokenizer', () => {
 
   })
 
+  describe('Line Break', () => {
+    it('hyphens', () => {
+      const input = '--- ';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [line] = tokens;
+      expect(line).toBeInstanceOf(LineBreakToken);
+    })
+
+    it('underlines', () => {
+      const input = '___ ';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [line] = tokens;
+      expect(line).toBeInstanceOf(LineBreakToken);
+    })
+
+    it('stars', () => {
+      const input = '*** ';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [line] = tokens;
+      expect(line).toBeInstanceOf(LineBreakToken);
+    })
+
+    it('mix to paragraph italics?', () => {
+      const input = '_*_ ';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [paragraph] = tokens;
+      expect(paragraph).toBeInstanceOf(ParagraphToken);
+      if (paragraph instanceof ParagraphToken) {
+        expect(paragraph.content).toBe('_*_ ');
+      }
+    });
+
+    it('mix to paragraph bold?', () => {
+      const input = '*_* ';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [paragraph] = tokens;
+      expect(paragraph).toBeInstanceOf(ParagraphToken);
+      if (paragraph instanceof ParagraphToken) {
+        expect(paragraph.content).toBe('*_* ');
+      }
+    });
+  })
+
   describe('Combinations', () => {
 
     it('heading then paragraph', () => {
       const input = "# Heading\nCaption\n";
       const tokens = tokenize(input);
-      console.log(tokens)
+
       expect(tokens.length).toBe(3);
       const [heading, paragraph] = tokens;
 
