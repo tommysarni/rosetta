@@ -20,7 +20,7 @@ jobs:
         run: npm install
 
       - name: Run Jest tests with JSON output
-        run: npm test:report
+        run: npm run test:report
 
       - name: Parse Jest results and set outputs
         id: parse_results
