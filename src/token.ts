@@ -1,6 +1,7 @@
 export enum TokenType {
   Heading = 'heading',
   EOF = 'eof',
+  Paragraph = 'paragraph'
 }
 
 export class Token {
@@ -23,6 +24,15 @@ export class HeadingToken extends Token {
     const prefix = raw.match(/^#+/)![0];
     this.level = prefix.length;
     this.content = raw.replace(prefix, '').trimStart();
+  }
+}
+
+export class ParagraphToken extends Token {
+  content: string;
+
+  constructor(raw: string) {
+    super(TokenType.Paragraph, raw);
+    this.content = raw;
   }
 }
 

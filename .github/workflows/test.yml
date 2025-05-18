@@ -1,6 +1,13 @@
-name: Run Tests
+name: Test and Comment on PR
 
-on: [push, pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   test:
@@ -8,8 +15,69 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm ci
-      - run: npm test
+      
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Jest tests with JSON output
+        run: npm run test:report
+
+      - name: Parse Jest results and set outputs
+        id: parse_results
+        run: |
+          echo "Parsing jest-result.json..."
+
+          # Read jest-result.json, extract summary fields with jq (install jq if needed)
+          sudo apt-get install -y jq
+
+          PASS_COUNT=$(jq '.numPassedTests' jest-result.json)
+          FAIL_COUNT=$(jq '.numFailedTests' jest-result.json)
+          SKIP_COUNT=$(jq '.numPendingTests' jest-result.json)
+
+          echo "pass_count=$PASS_COUNT" >> $GITHUB_OUTPUT
+          echo "fail_count=$FAIL_COUNT" >> $GITHUB_OUTPUT
+          echo "skip_count=$SKIP_COUNT" >> $GITHUB_OUTPUT
+
+          echo "Pass: $PASS_COUNT, Fail: $FAIL_COUNT, Skip: $SKIP_COUNT"
+
+      - name: Comment on PR with test results
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pass = parseInt(process.env.PASS_COUNT);
+            const fail = parseInt(process.env.FAIL_COUNT);
+            const skip = parseInt(process.env.SKIP_COUNT);
+            const pr = context.payload.pull_request;
+
+            if (!pr) {
+              console.log("No pull request context, skipping comment");
+              return;
+            }
+
+            const commentBody = `
+            ### Jest Test Results Summary
+
+            | Passed | Failed | Skipped |
+            | ------ | ------ | ------- |
+            | ${pass} | ${fail} | ${skip} |
+
+            ${fail > 0 ? '⚠️ Some tests failed! Please fix before merging.' : '✅ All tests passed! Good to go.'}
+            `;
+
+            // Post the comment on the PR
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: commentBody,
+            });
+        env:
+          PASS_COUNT: ${{ steps.parse_results.outputs.pass_count }}
+          FAIL_COUNT: ${{ steps.parse_results.outputs.fail_count }}
+          SKIP_COUNT: ${{ steps.parse_results.outputs.skip_count }}
