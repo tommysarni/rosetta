@@ -3,6 +3,7 @@ export enum TokenType {
   EOF = 'eof',
   Paragraph = 'paragraph',
   LineBreak = 'linebreak',
+  CodeBlock = 'code-block',
 }
 
 export class Token {
@@ -41,6 +42,22 @@ export class LineBreakToken extends Token {
 
   constructor(raw: string) {
     super(TokenType.LineBreak, raw);
+  }
+}
+
+export class CodeBlockToken extends Token {
+  lang?: string;
+  fence: string;
+  closed: boolean;
+  content: string;
+
+
+  constructor(raw: string, lang: string, fence: string, closed = true) {
+    super(TokenType.CodeBlock, raw);
+    this.lang = lang;
+    this.fence = fence;
+    this.content = raw.replace(/^(`{3}|~{3})(\w*)?(\s*)?/, '').replace(/(\s*)?(`{3})$/, '');
+    this.closed = closed;
   }
 }
 

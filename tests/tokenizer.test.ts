@@ -1,4 +1,4 @@
-import { EOFToken, HeadingToken, LineBreakToken, ParagraphToken, TokenType } from '../src/token';
+import { CodeBlockToken, EOFToken, HeadingToken, LineBreakToken, ParagraphToken, TokenType } from '../src/token';
 import { tokenize } from '../src/tokenizer';
 
 describe('Tokenizer', () => {
@@ -176,6 +176,77 @@ describe('Tokenizer', () => {
       expect(paragraph).toBeInstanceOf(ParagraphToken);
       if (paragraph instanceof ParagraphToken) {
         expect(paragraph.content).toBe('*_* ');
+      }
+    });
+  })
+
+  describe('Code Blocks', () => {
+
+    it('empty code block', () => {
+      const input = '```\n```';
+      const tokens = tokenize(input);
+
+      expect(tokens.length).toBe(2);
+      const [block] = tokens;
+      expect(block).toBeInstanceOf(CodeBlockToken);
+      if (block instanceof CodeBlockToken) {
+        expect(block.fence).toBe('```');
+        expect(block.lang).toBeUndefined();
+        expect(block.content).toBe('');
+      }
+    })
+
+    it('js code block - one line', () => {
+      const input = '```js\nconsole.log("I am Code!");\n```';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [block] = tokens;
+      expect(block).toBeInstanceOf(CodeBlockToken);
+      if (block instanceof CodeBlockToken) {
+        expect(block.fence).toBe('```');
+        expect(block.lang).toBe('js');
+        expect(block.content).toBe('console.log("I am Code!");');
+      }
+    })
+
+    it('js code block - one line extra newlines', () => {
+      const input = '```js\n \nconsole.log("I am Code!");\n\n```';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [block] = tokens;
+      expect(block).toBeInstanceOf(CodeBlockToken);
+      if (block instanceof CodeBlockToken) {
+        expect(block.fence).toBe('```');
+        expect(block.lang).toBe('js');
+        expect(block.content).toBe('console.log("I am Code!");');
+      }
+    })
+
+    it('js code block - missing end fence', () => {
+      const input = '```js\nconsole.log("I am Code!");\n\nThis would have been a paragraph.';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [block] = tokens;
+      expect(block).toBeInstanceOf(CodeBlockToken);
+      if (block instanceof CodeBlockToken) {
+        expect(block.fence).toBe('```');
+        expect(block.lang).toBe('js');
+        expect(block.closed).toBe(false);
+        expect(block.content).toBe('console.log("I am Code!");\n\nThis would have been a paragraph.');
+      }
+    });
+
+    it('css code block', () => {
+      const input = '```css\n* {\n\n\n}\n\nhtml {\ncolor: blue;\n}\n\n```';
+      const tokens = tokenize(input);
+      expect(tokens.length).toBe(2);
+      const [block] = tokens;
+      expect(block).toBeInstanceOf(CodeBlockToken);
+      if (block instanceof CodeBlockToken) {
+        expect(block.fence).toBe('```');
+        expect(block.lang).toBe('css');
+        expect(block.closed).toBe(true);
+        expect(block.content).toBe('* {\n\n\n}\n\nhtml {\ncolor: blue;\n}');
       }
     });
   })

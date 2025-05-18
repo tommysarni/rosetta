@@ -11,7 +11,7 @@ Goal is to have a robust markdown system that works with LaTeX and mermaid Diagr
 | ❌      | ❌      | ❌     | ❌        | `blockquote`      | `> blockquote`, nestable        | Can be nested (`>>`)              |       
 | ❌      | ❌      | ❌     | ❌        | `list_item`       | `- item`, `* item`, `1. item`, nestable | Ordered & unordered               |        
 | ❌      | ❌      | ❌     | ❌        | `list`            | A group of `list_item`s         | Unordered, ordered, or task lists |      
-| ❌      | ❌      | ❌     | ❌        | `code_block`      | Indented or fenced with ` ``` ` | Optional language tag             | 
+| 🛠️      | ✅      | ❌     | ❌        | `code_block`      | Indented or fenced with ` ``` ` | Optional language tag             | 
 | 🛠️      | ✅      | ❌     | ❌        | `thematic_break`  | `---`, `***`, `___`             | Horizontal rule                   | 
 | ❌      | ❌      | ❌     | ❌        | `html_block`      | Raw HTML tags like `<div>`, nestable | Dangerous in some renderers       |
 | ❌      | ❌      | ❌     | ❌        | `table`           | GFM only, uses pipes            | Rows and cells                    |
