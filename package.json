@@ -6,6 +6,7 @@
     "build": "tsc",
     "start": "ts-node src/index.ts",
     "test": "jest",
+    "test:report": "jest --json --outputFile=jest-result.json",
     "lint": "eslint src tests --ext .ts"
   },
   "keywords": [],

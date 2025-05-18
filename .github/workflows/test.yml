@@ -10,36 +10,69 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
       
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
-        id: test
-        run: |
-          # Run your tests and save output to a file
-          npm test > result.txt || true
+      - name: Run Jest tests with JSON output
+        run: npm test:report
 
-      - name: Extract test results summary
-        id: summary
+      - name: Parse Jest results and set outputs
+        id: parse_results
         run: |
-          # Just as an example, extract lines with "PASS" or "FAIL"
-          PASS_COUNT=$(grep -c "PASS" result.txt || echo 0)
-          FAIL_COUNT=$(grep -c "FAIL" result.txt || echo 0)
+          echo "Parsing jest-result.json..."
+
+          # Read jest-result.json, extract summary fields with jq (install jq if needed)
+          sudo apt-get install -y jq
+
+          PASS_COUNT=$(jq '.numPassedTests' jest-result.json)
+          FAIL_COUNT=$(jq '.numFailedTests' jest-result.json)
+          SKIP_COUNT=$(jq '.numPendingTests' jest-result.json)
+
           echo "pass_count=$PASS_COUNT" >> $GITHUB_OUTPUT
           echo "fail_count=$FAIL_COUNT" >> $GITHUB_OUTPUT
+          echo "skip_count=$SKIP_COUNT" >> $GITHUB_OUTPUT
 
-      - name: Comment on the PR
-        uses: peter-evans/create-or-update-comment@v4
+          echo "Pass: $PASS_COUNT, Fail: $FAIL_COUNT, Skip: $SKIP_COUNT"
+
+      - name: Comment on PR with test results
+        uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ### 🧪 Test Results
-            ✅ Passed tests: ${{ steps.summary.outputs.pass_count }}
-            ❌ Failed tests: ${{ steps.summary.outputs.fail_count }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pass = parseInt(process.env.PASS_COUNT);
+            const fail = parseInt(process.env.FAIL_COUNT);
+            const skip = parseInt(process.env.SKIP_COUNT);
+            const pr = context.payload.pull_request;
 
-            _See full logs [here](./result.txt)_
+            if (!pr) {
+              console.log("No pull request context, skipping comment");
+              return;
+            }
+
+            const commentBody = `
+            ### Jest Test Results Summary
+
+            | Passed | Failed | Skipped |
+            | ------ | ------ | ------- |
+            | ${pass} | ${fail} | ${skip} |
+
+            ${fail > 0 ? '⚠️ Some tests failed! Please fix before merging.' : '✅ All tests passed! Good to go.'}
+            `;
+
+            // Post the comment on the PR
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: commentBody,
+            });
+        env:
+          PASS_COUNT: ${{ steps.parse_results.outputs.pass_count }}
+          FAIL_COUNT: ${{ steps.parse_results.outputs.fail_count }}
+          SKIP_COUNT: ${{ steps.parse_results.outputs.skip_count }}
