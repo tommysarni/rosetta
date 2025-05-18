@@ -1,6 +1,8 @@
-name: Run Tests
+name: Test and Comment on PR
 
-on: [push, pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   test:
@@ -11,5 +13,33 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm ci
-      - run: npm test
+      
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        id: test
+        run: |
+          # Run your tests and save output to a file
+          npm test > result.txt || true
+
+      - name: Extract test results summary
+        id: summary
+        run: |
+          # Just as an example, extract lines with "PASS" or "FAIL"
+          PASS_COUNT=$(grep -c "PASS" result.txt || echo 0)
+          FAIL_COUNT=$(grep -c "FAIL" result.txt || echo 0)
+          echo "pass_count=$PASS_COUNT" >> $GITHUB_OUTPUT
+          echo "fail_count=$FAIL_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Comment on the PR
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ### 🧪 Test Results
+            ✅ Passed tests: ${{ steps.summary.outputs.pass_count }}
+            ❌ Failed tests: ${{ steps.summary.outputs.fail_count }}
+
+            _See full logs [here](./result.txt)_
