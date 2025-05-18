@@ -4,23 +4,23 @@ Goal is to have a robust markdown system that works with LaTeX and mermaid Diagr
 ## Status
 
 ### 🧱 Block-Level Elements
-| ✅ Impl | ✅ Token | ✅ AST | ✅ Render | Type              | Syntax Example                  | Notes                             |                |
-| ------ | ------ | ----- | -------- | ----------------- | ------------------------------- | --------------------------------- | -------------- |
-| 🛠️      | ✅      | ❌     | ❌        | `heading`         | `# H1`, `## H2`, …              | 6 levels (`#` to `######`)        |                |
-| 🛠️      | ✅      | ❌     | ❌        | `paragraph`       | Text separated by blank lines   | Most common block                 |                |
-| ❌      | ❌      | ❌     | ❌        | `blockquote`      | `> blockquote`                  | Can be nested (`>>`)              |                |
-| ❌      | ❌      | ❌     | ❌        | `list_item`       | `- item`, `* item`, `1. item`   | Ordered & unordered               |                |
-| ❌      | ❌      | ❌     | ❌        | `list`            | A group of `list_item`s         | Unordered, ordered, or task lists |                |
-| ❌      | ❌      | ❌     | ❌        | `code_block`      | Indented or fenced with ` ``` ` | Optional language tag             |                |
-| ❌      | ❌      | ❌     | ❌        | `thematic_break`  | `---`, `***`, `___`             | Horizontal rule                   |                |
-| ❌      | ❌      | ❌     | ❌        | `html_block`      | Raw HTML tags like `<div>`      | Dangerous in some renderers       |                |
-| ❌      | ❌      | ❌     | ❌        | `table`           | GFM only, uses pipes (\`        | \`)                               | Rows and cells |
-| ❌      | ❌      | ❌     | ❌        | `definition_list` | `Term\n: Definition`            | Rare, in Markdown Extra           |                |
-| ❌      | ❌      | ❌     | ❌        | `math_block`      | `$$ math $$`                    | Common in Obsidian/LaTeX-style    |                |
-| ❌      | ❌      | ❌     | ❌        | `diagram_block`   | ` ```mermaid `                  | Mermaid, PlantUML, etc.           |                |
-| ❌      | ❌      | ❌     | ❌        | `front_matter`    | `---` at start (YAML)           | Static site generators            |                |
-| ❌      | ❌      | ❌     | ❌        | `task_list_item`  | `- [ ] task`, `- [x] done`      | GitHub flavored                   |                |
-| ❌      | ❌      | ❌     | ❌        | `footnote_def`    | `[^1]: Footnote text`           | Footnotes support                 |                |
+| ✅ Impl | ✅ Token | ✅ AST | ✅ Render | Type              | Syntax Example                  | Notes                            |
+| ------  | ------  | -----  | -------- | ----------------- | ------------------------------- | --------------------------------- | 
+| 🛠️      | ✅      | ❌     | ❌        | `heading`         | `# H1`, `## H2`, …              | 6 levels (`#` to `######`)        |
+| 🛠️      | ✅      | ❌     | ❌        | `paragraph`       | Text separated by blank lines   | Most common block                 |  
+| ❌      | ❌      | ❌     | ❌        | `blockquote`      | `> blockquote`, nestable        | Can be nested (`>>`)              |       
+| ❌      | ❌      | ❌     | ❌        | `list_item`       | `- item`, `* item`, `1. item`, nestable | Ordered & unordered               |        
+| ❌      | ❌      | ❌     | ❌        | `list`            | A group of `list_item`s         | Unordered, ordered, or task lists |      
+| ❌      | ❌      | ❌     | ❌        | `code_block`      | Indented or fenced with ` ``` ` | Optional language tag             | 
+| ❌      | ❌      | ❌     | ❌        | `thematic_break`  | `---`, `***`, `___`             | Horizontal rule                   | 
+| ❌      | ❌      | ❌     | ❌        | `html_block`      | Raw HTML tags like `<div>`, nestable | Dangerous in some renderers       |
+| ❌      | ❌      | ❌     | ❌        | `table`           | GFM only, uses pipes            | Rows and cells                    |
+| ❌      | ❌      | ❌     | ❌        | `definition_list` | `Term\n: Definition`, nestable  | Rare, in Markdown Extra           |
+| ❌      | ❌      | ❌     | ❌        | `math_block`      | `$$ math $$`                    | Common in Obsidian/LaTeX-style    |
+| ❌      | ❌      | ❌     | ❌        | `diagram_block`   | ` ```mermaid `                  | Mermaid, PlantUML, etc.           |
+| ❌      | ❌      | ❌     | ❌        | `front_matter`    | `---` at start (YAML)           | Static site generators            |
+| ❌      | ❌      | ❌     | ❌        | `task_list_item`  | `- [ ] task`, `- [x] done`, nestable | GitHub flavored                   |
+| ❌      | ❌      | ❌     | ❌        | `footnote_def`    | `[^1]: Footnote text`, nestable | Footnotes support                 |
 
 
 ### ✍️ Inline Elements
