@@ -7,7 +7,7 @@ Goal is to have a robust markdown system that works with LaTeX and mermaid Diagr
 | ✅ Impl | ✅ Token | ✅ AST | ✅ Render | Type              | Syntax Example                  | Notes                             |                |
 | ------ | ------ | ----- | -------- | ----------------- | ------------------------------- | --------------------------------- | -------------- |
 | 🛠️      | ✅      | ❌     | ❌        | `heading`         | `# H1`, `## H2`, …              | 6 levels (`#` to `######`)        |                |
-| ❌      | ❌      | ❌     | ❌        | `paragraph`       | Text separated by blank lines   | Most common block                 |                |
+| 🛠️      | ✅      | ❌     | ❌        | `paragraph`       | Text separated by blank lines   | Most common block                 |                |
 | ❌      | ❌      | ❌     | ❌        | `blockquote`      | `> blockquote`                  | Can be nested (`>>`)              |                |
 | ❌      | ❌      | ❌     | ❌        | `list_item`       | `- item`, `* item`, `1. item`   | Ordered & unordered               |                |
 | ❌      | ❌      | ❌     | ❌        | `list`            | A group of `list_item`s         | Unordered, ordered, or task lists |                |
